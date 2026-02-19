@@ -241,8 +241,8 @@ const AdminHomepage = () => {
               ) : (
                 leaveRequests.map((request) => (
                   <tr key={request.id}>
-                    <td style={tdStyle}>{request.user?.name || 'Unknown'}</td>
-                    <td style={tdStyle}>{request.user?.student_id || 'N/A'}</td>
+                    <td style={tdStyle}>{request.student_name || 'Unknown'}</td>
+                    <td style={tdStyle}>{request.student_id || 'N/A'}</td>
                     <td style={tdStyle}>{request.from_date}</td>
                     <td style={tdStyle}>{request.to_date}</td>
                     <td style={tdStyle}>{request.leave_type}</td>
