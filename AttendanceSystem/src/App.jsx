@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import AuthPage from './pages/AuthPage';
 import AdminHomepage from './pages/AdminHomepage';
 import UserHomepage from './pages/UserHomepage';
+import ProofSubmission from './pages/ProofSubmission';
 import { authAPI } from './services/api';
 
 // Protected Route Component for authentication
@@ -25,7 +26,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Navigate to="/auth" replace />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route 
           path="/admin" 
@@ -42,6 +44,14 @@ function App() {
               <UserHomepage />
             </ProtectedRoute>
           } 
+        />
+        <Route
+          path="/proof-submission"
+          element={
+            <ProtectedRoute requiredRole="user">
+              <ProofSubmission />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </Router>

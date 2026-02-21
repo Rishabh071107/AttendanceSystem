@@ -84,3 +84,24 @@ exports.getStatistics = (req, res) => {
     });
   }
 };
+
+// Set proof deadline for a leave request
+exports.setProofDeadline = (req, res) => {
+  const { id } = req.params;
+  const { proof_deadline } = req.body;
+  
+  if (!proof_deadline) {
+    return res.status(400).json({ message: 'Proof deadline is required' });
+  }
+  
+  const query = 'UPDATE leave_requests SET proof_deadline = ? WHERE id = ?';
+  db.query(query, [proof_deadline, id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error setting proof deadline', error: err.message });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: 'Leave request not found' });
+    }
+    res.json({ message: 'Proof deadline set successfully' });
+  });
+};

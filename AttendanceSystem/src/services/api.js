@@ -99,6 +99,20 @@ export const leaveAPI = {
     return response.json();
   },
 
+  // Submit proof (file upload) for a leave request
+  submitProof: async (leaveId, file, description) => {
+    const formData = new FormData();
+    formData.append('proof', file);
+    if (description) formData.append('description', description);
+
+    const response = await fetch(`${BASE_URL}/user/leave-requests/${leaveId}/proof`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${getToken()}` },
+      body: formData,
+    });
+    return response.json();
+  },
+
   // Get user profile
   getProfile: async () => {
     const response = await fetch(`${BASE_URL}/user/profile`, {
@@ -161,6 +175,18 @@ export const adminAPI = {
   getStatistics: async () => {
     const response = await fetch(`${BASE_URL}/admin/statistics`, {
       headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    return response.json();
+  },
+  // Set proof deadline for a leave request
+  setProofDeadline: async (leaveId, dateString) => {
+    const response = await fetch(`${BASE_URL}/admin/leave-requests/${leaveId}/proof-deadline`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({ proof_deadline: dateString }),
     });
     return response.json();
   },

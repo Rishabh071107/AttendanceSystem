@@ -22,4 +22,8 @@ router.get('/users', adminController.getAllUsers);
 // Get statistics
 router.get('/statistics', adminController.getStatistics);
 
+// Set proof deadline for a leave request
+router.put('/leave-requests/:id/proof-deadline', adminController.setProofDeadline);
+
 module.exports = router;
+

@@ -55,7 +55,26 @@ const AdminHomepage = () => {
         request.id === id ? { ...request, status: 'Rejected' } : request
       ));
     } catch (err) {
-      alert('Failed to reject request');
+      alert('Failed to reject request');              
+    }
+  };
+
+  // Proof deadline state and handler
+  const [proofDates, setProofDates] = useState({});
+  const handleProofDateChange = (id, value) => {
+    setProofDates(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleSetProofDeadline = async (id) => {
+    const date = proofDates[id];
+    if (!date) return alert('Please select a deadline date');
+    try {
+      await adminAPI.setProofDeadline(id, date);
+      // update local state
+      setLeaveRequests(leaveRequests.map(r => r.id === id ? { ...r, proof_deadline: date } : r));
+      alert('Proof deadline set');
+    } catch (err) {
+      alert('Failed to set proof deadline');
     }
   };
 
@@ -248,27 +267,40 @@ const AdminHomepage = () => {
                     <td style={tdStyle}>{request.leave_type}</td>
                     <td style={tdStyle}>{request.description}</td>
                     <td style={tdStyle}>
-                      <span style={statusStyle(request.status)}>
-                        {request.status}
-                      </span>
+                      <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                        <span style={statusStyle(request.status)}>
+                          {request.status}
+                        </span>
+                        {request.proof_deadline && (
+                          <small>Deadline: {new Date(request.proof_deadline).toLocaleDateString()}</small>
+                        )}
+                      </div>
                     </td>
                     <td style={tdStyle}>
-                      {request.status === 'Pending' && (
-                        <div style={buttonContainerStyle}>
-                          <button
-                            style={approveButtonStyle}
-                            onClick={() => handleApprove(request.id)}
-                          >
-                            Approve
-                          </button>
-                          <button
-                            style={rejectButtonStyle}
-                            onClick={() => handleReject(request.id)}
-                          >
-                            Reject
-                          </button>
+                      <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem'}}>
+                        {request.status === 'Pending' && (
+                          <div style={buttonContainerStyle}>
+                            <button
+                              style={approveButtonStyle}
+                              onClick={() => handleApprove(request.id)}
+                            >
+                              Approve
+                            </button>
+                            <button
+                              style={rejectButtonStyle}
+                              onClick={() => handleReject(request.id)}
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Proof deadline controls (show for sick/on duty or all) */}
+                        <div style={{display: 'flex', gap: '0.5rem', alignItems: 'center'}}>
+                          <input type="date" value={proofDates[request.id] || ''} onChange={e => handleProofDateChange(request.id, e.target.value)} />
+                          <button onClick={() => handleSetProofDeadline(request.id)} style={{padding: '0.4rem 0.6rem', borderRadius: '6px', border: 'none', backgroundColor: '#2563EB', color: 'white'}}>Set Deadline</button>
                         </div>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))

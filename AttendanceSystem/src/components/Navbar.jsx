@@ -162,7 +162,7 @@ const Navbar = () => {
       </div>
 
       <div style={navLinksStyle}>
-        <Link to="/" style={linkStyle(location.pathname === '/')}>
+        <Link to="/home" style={linkStyle(location.pathname === '/home')}>
           🏠 Home
         </Link>
         
@@ -173,9 +173,14 @@ const Navbar = () => {
         )}
         
         {user && user.role === 'user' && (
-          <Link to="/user" style={linkStyle(isUserPage)}>
-            📝 My Leave Requests
-          </Link>
+          <>
+            <Link to="/user" style={linkStyle(isUserPage)}>
+              📝 My Leave Requests
+            </Link>
+            <Link to="/proof-submission" style={linkStyle(location.pathname === '/proof-submission')}>
+              📁 Proof Submission
+            </Link>
+          </>
         )}
       </div>
 

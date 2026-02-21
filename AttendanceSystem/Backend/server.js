@@ -42,9 +42,26 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
+const fs = require('fs');
 
-app.listen(PORT, () => {
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('Created uploads directory at', uploadsDir);
+}
+
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+server.on('error', (err) => {
+  if (err && err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Stop the process using it or set PORT to a free port.`);
+  } else {
+    console.error('Server error:', err);
+  }
+  process.exit(1);
 });
 
 module.exports = app;

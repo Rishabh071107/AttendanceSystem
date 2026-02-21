@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../Controllers/userController');
 const { verifyToken, isUser } = require('../Middlewares/auth');
+const upload = require('../Middlewares/uploads');
 
 // Public routes (no authentication required)
 
@@ -25,6 +26,9 @@ router.post('/leave', isUser, userController.applyLeave);
 
 // Cancel leave request
 router.delete('/leave-requests/:id', isUser, userController.cancelLeaveRequest);
+
+// Submit proof for a leave request (file upload)
+router.post('/leave-requests/:id/proof', isUser, upload.single('proof'), userController.submitProof);
 
 // Get user profile
 router.get('/profile', isUser, userController.getProfile);

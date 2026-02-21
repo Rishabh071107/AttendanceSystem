@@ -25,8 +25,22 @@ CREATE TABLE IF NOT EXISTS leave_requests (
   description TEXT,
   status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
   admin_remarks TEXT,
+  proof_deadline DATE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Proof submissions table
+CREATE TABLE IF NOT EXISTS proof_submissions (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  leave_request_id INT NOT NULL,
+  user_id INT NOT NULL,
+  file_path VARCHAR(255),
+  file_name VARCHAR(255),
+  description TEXT,
+  submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (leave_request_id) REFERENCES leave_requests(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

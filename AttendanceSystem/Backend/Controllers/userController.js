@@ -171,3 +171,43 @@ exports.updateProfile = (req, res) => {
     res.json({ message: 'Profile updated successfully' });
   });
 };
+
+// Submit proof (file upload) for a specific leave request
+exports.submitProof = (req, res) => {
+  const userId = req.user.id;
+  const leaveRequestId = req.params.id;
+
+  if (!req.file) {
+    return res.status(400).json({ message: 'No proof file uploaded' });
+  }
+
+  // Check that leave request exists and belongs to the user
+  const checkQuery = 'SELECT * FROM leave_requests WHERE id = ? AND user_id = ?';
+  db.query(checkQuery, [leaveRequestId, userId], (err, results) => {
+    if (err) return res.status(500).json({ message: 'Error checking leave request', error: err.message });
+    if (results.length === 0) return res.status(404).json({ message: 'Leave request not found' });
+
+    const leave = results[0];
+
+    // If a proof_deadline is set, ensure it's not passed
+    if (leave.proof_deadline) {
+      const now = new Date();
+      const deadline = new Date(leave.proof_deadline);
+      if (now > deadline) {
+        return res.status(400).json({ message: 'Proof deadline has passed' });
+      }
+    }
+
+    // Save submission record
+    const filePath = `/uploads/${req.file.filename}`;
+    const fileName = req.file.originalname;
+    const description = req.body.description || '';
+
+    const insertQuery = 'INSERT INTO proof_submissions (leave_request_id, user_id, file_path, file_name, description) VALUES (?, ?, ?, ?, ?)';
+    db.query(insertQuery, [leaveRequestId, userId, filePath, fileName, description], (err2, result2) => {
+      if (err2) return res.status(500).json({ message: 'Error saving proof submission', error: err2.message });
+
+      return res.status(201).json({ message: 'Proof submitted successfully', submissionId: result2.insertId, file: { path: filePath, name: fileName } });
+    });
+  });
+};
